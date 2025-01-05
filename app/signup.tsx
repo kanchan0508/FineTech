@@ -40,9 +40,10 @@ export default function signup() {
       <View style={{flex: 1}} />
       <TouchableOpacity
         style={[
-          defaultStyles.pillButton,
-          { backgroundColor: Colors.primary, marginBottom: 20 },
-        ]} >
+                 defaultStyles.pillButton,
+                phoneNumber !== "" ? styles.enabled : styles.disabled,
+                {marginBottom: 20}
+               ]} onPress={onSignup} >
           <Text style={defaultStyles.buttonText}>
             Sign up
           </Text>
