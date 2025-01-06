@@ -46,9 +46,10 @@ const InitialLayout = () => {
           headerShadowVisible: false,
           headerStyle: { backgroundColor: Colors.background },
           headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <Ionicons name="arrow-back" size={34} color={Colors.dark} />
-            </TouchableOpacity>
+            <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.push("/"))}>
+            <Ionicons name="arrow-back" size={34} color={Colors.dark} />
+          </TouchableOpacity>
+          
           ),
         }}
       />
@@ -61,9 +62,13 @@ const InitialLayout = () => {
           headerShadowVisible: false,
           headerStyle: { backgroundColor: Colors.background },
           headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <Ionicons name="arrow-back" size={34} color={Colors.dark} />
-            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+              console.log("Left button pressed");
+              router.back();
+            }}>
+            <Ionicons name="arrow-back" size={34} color={Colors.dark} />
+          </TouchableOpacity>
+          
           ),
           headerRight: () => (
             <Link href={"/help"} asChild>
@@ -85,10 +90,14 @@ const InitialLayout = () => {
     </Stack>
   );
 };
+
 function RootLayoutNav() {
   return (
-   <GestureHandlerRootView style={{flex:1}}>
-    <InitialLayout />
-   </GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <InitialLayout />
+    </GestureHandlerRootView>
   );
 }
+
+// Export the RootLayoutNav as the default export
+export default RootLayoutNav;
