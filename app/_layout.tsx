@@ -124,18 +124,6 @@ const InitialLayout = () => {
   );
 };
 
-<<<<<<< HEAD
-function RootLayoutNav() {
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <InitialLayout />
-    </GestureHandlerRootView>
-  );
-}
-
-// Export the RootLayoutNav as the default export
-export default RootLayoutNav;
-=======
 const RootLayoutNav = () => {
   return (
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY!} tokenCache={tokenCache}>
@@ -148,4 +136,3 @@ const RootLayoutNav = () => {
 };
 
 export default RootLayoutNav;
->>>>>>> 5c015884994c2bd7bd63ef1de7875c2485fa80c0
