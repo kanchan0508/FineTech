@@ -1,24 +1,33 @@
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from "react-native";
-import React, { useState } from "react";
-import { defaultStyles } from "@/constants/Styles";
-import Colors from "@/constants/Colors";
-import { Link, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { isClerkAPIResponseError, useSignIn } from "@clerk/clerk-expo";
+import Colors from '@/constants/Colors';
+import { defaultStyles } from '@/constants/Styles';
+import { isClerkAPIResponseError, useSignIn } from '@clerk/clerk-expo';
+import { Ionicons } from '@expo/vector-icons';
+import { Link, useRouter } from 'expo-router';
+import { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
 
-export default function login() {
-  const [countryCode, setCountryCode] = useState("+44");
-  const [phoneNumber, setPhoneNumber] = useState("");
+enum SignInType {
+  Phone,
+  Email,
+  Google,
+  Apple,
+}
 
+const Page = () => {
+  const [countryCode, setCountryCode] = useState('+91');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const keyboardVerticalOffset = Platform.OS === 'ios' ? 80 : 0;
   const router = useRouter();
   const { signIn } = useSignIn();
-
-  enum SignInType {
-    Phone,
-    Email,
-    Google,
-    Apple,
-  }
 
   const onSignIn = async (type: SignInType) => {
     if (type === SignInType.Phone) {
@@ -53,40 +62,44 @@ export default function login() {
       }
     }
   };
+
   return (
-   
-    <View style={defaultStyles.container}>
-      <Text style={defaultStyles.header}>Welcome back</Text>
-      <Text style={defaultStyles.descriptionText}>
-        Enter the phone number associated with your account
-      </Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Country Code"
-          placeholderTextColor={Colors.gray}
-          value={countryCode}
-        />
-        <TextInput
-          style={[styles.input, { flex: 1 }]}
-          placeholder="Mobile number"
-          placeholderTextColor={Colors.gray}
-          keyboardType="numeric"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-        />
-      </View> 
-     
-      <TouchableOpacity
-        style={[
-          defaultStyles.pillButton,
-         phoneNumber !== "" ? styles.enabled : styles.disabled,
-         {marginBottom: 20}
-        ]} onPress={()=>onSignIn(SignInType.Phone)} >
-          <Text style={defaultStyles.buttonText}>
-            Continue
-          </Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior="padding"
+      keyboardVerticalOffset={keyboardVerticalOffset}>
+      <View style={defaultStyles.container}>
+        <Text style={defaultStyles.header}>Welcome back</Text>
+        <Text style={defaultStyles.descriptionText}>
+          Enter the phone number associated with your account
+        </Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Country code"
+            placeholderTextColor={Colors.gray}
+            value={countryCode}
+          />
+          <TextInput
+            style={[styles.input, { flex: 1 }]}
+            placeholder="Mobile number"
+            placeholderTextColor={Colors.gray}
+            keyboardType="numeric"
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={[
+            defaultStyles.pillButton,
+            phoneNumber !== '' ? styles.enabled : styles.disabled,
+            { marginBottom: 20 },
+          ]}
+          onPress={() => onSignIn(SignInType.Phone)}>
+          <Text style={defaultStyles.buttonText}>Continue</Text>
         </TouchableOpacity>
+
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
           <View
             style={{ flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: Colors.gray }}
@@ -124,7 +137,7 @@ export default function login() {
             },
           ]}>
           <Ionicons name="logo-google" size={24} color={'#000'} />
-          <Text style={[defaultStyles.buttonText, { color: '#000' }]}>Continue with google </Text>
+          <Text style={[defaultStyles.buttonText, { color: '#000' }]}>Continue with Google </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -139,17 +152,16 @@ export default function login() {
             },
           ]}>
           <Ionicons name="logo-apple" size={24} color={'#000'} />
-          <Text style={[defaultStyles.buttonText, { color: '#000' }]}>Continue with apple </Text>
+          <Text style={[defaultStyles.buttonText, { color: '#000' }]}>Continue apple </Text>
         </TouchableOpacity>
-    </View>
-
+      </View>
+    </KeyboardAvoidingView>
   );
-}
-
+};
 const styles = StyleSheet.create({
   inputContainer: {
     marginVertical: 40,
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   input: {
     backgroundColor: Colors.lightGray,
@@ -165,3 +177,4 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryMuted,
   },
 });
+export default Page;

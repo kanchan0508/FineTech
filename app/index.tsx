@@ -26,7 +26,7 @@ const Page = () => {
 
       <View style={styles.buttons}>
         <Link
-          href={`/login`}
+          href={'/login'}
           style={[defaultStyles.pillButton, { flex: 1, backgroundColor: Colors.dark }]}
           asChild>
           <TouchableOpacity>
