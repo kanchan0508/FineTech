@@ -1,18 +1,17 @@
-import React from 'react';
-import { TouchableOpacity } from 'react-native';
-import { Link, Stack, useSegments,Navigator } from 'expo-router';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
+import { Link, Stack, useSegments, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import Colors from '../constants/Colors';
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 import * as SecureStore from 'expo-secure-store';
+
+const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 // Cache the Clerk JWT
 const tokenCache = {
@@ -32,11 +31,6 @@ const tokenCache = {
   },
 };
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
-
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -45,11 +39,11 @@ const InitialLayout = () => {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
+
   const router = useRouter();
   const { isLoaded, isSignedIn } = useAuth();
   const segments = useSegments();
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -60,7 +54,26 @@ const InitialLayout = () => {
     }
   }, [loaded]);
 
-  
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const inAuthGroup = segments[0] && segments[0].startsWith("authenticated");
+
+    if (isSignedIn && !inAuthGroup) {
+      router.replace("/authenticated/tabs/home");
+    } else if (!isSignedIn) {
+      router.replace("/");
+    }
+  }, [isSignedIn, segments]);
+
+  if (!loaded || !isLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -73,13 +86,11 @@ const InitialLayout = () => {
           headerStyle: { backgroundColor: Colors.background },
           headerLeft: () => (
             <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.push("/"))}>
-            <Ionicons name="arrow-back" size={34} color={Colors.dark} />
-          </TouchableOpacity>
-          
+              <Ionicons name="arrow-back" size={34} color={Colors.dark} />
+            </TouchableOpacity>
           ),
         }}
       />
-
       <Stack.Screen
         name="login"
         options={{
@@ -88,16 +99,12 @@ const InitialLayout = () => {
           headerShadowVisible: false,
           headerStyle: { backgroundColor: Colors.background },
           headerLeft: () => (
-            <TouchableOpacity onPress={() => {
-              console.log("Left button pressed");
-              router.back();
-            }}>
-            <Ionicons name="arrow-back" size={34} color={Colors.dark} />
-          </TouchableOpacity>
-          
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={34} color={Colors.dark} />
+            </TouchableOpacity>
           ),
           headerRight: () => (
-            <Link href={'/help'} asChild>
+            <Link href="/help" asChild>
               <TouchableOpacity>
                 <Ionicons name="help-circle-outline" size={34} color={Colors.dark} />
               </TouchableOpacity>
@@ -105,9 +112,7 @@ const InitialLayout = () => {
           ),
         }}
       />
-
       <Stack.Screen name="help" options={{ title: 'Help', presentation: 'modal' }} />
-
       <Stack.Screen
         name="verify/[phone]"
         options={{
@@ -122,17 +127,17 @@ const InitialLayout = () => {
           ),
         }}
       />
-      </Stack>
+    </Stack>
   );
 };
 
 const RootLayoutNav = () => {
   return (
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY!} tokenCache={tokenCache}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <StatusBar style="light" />
-            <InitialLayout />
-          </GestureHandlerRootView> 
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar style="light" />
+        <InitialLayout />
+      </GestureHandlerRootView>
     </ClerkProvider>
   );
 };
